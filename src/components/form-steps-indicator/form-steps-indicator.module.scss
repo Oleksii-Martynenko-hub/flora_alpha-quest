@@ -1,0 +1,92 @@
+.stepsList {
+  display: flex;
+
+  .step {
+    position: relative;
+
+    &:not(:last-child) {
+      margin-right: 48px;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: calc(100% + 4px);
+        transform: translateY(-50%);
+        display: block;
+        width: 40px;
+        height: 1px;
+        background-color: var(--text-white-opacity);
+      }
+    }
+    
+    .stepMarker {
+      display: block;
+      width: 8px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background-color: var(--text-white-opacity);
+    }
+    
+    .stepLabel {
+      display: none;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--text-white-opacity);
+    }
+    
+    &.current {
+      .stepMarker {
+        background-color: var(--foreground);
+      }
+
+      .stepLabel {
+        color: var(--foreground);
+      }
+    }
+    
+    &.finished {
+      .stepMarker {
+        background-color: var(--primary);
+      }
+      .stepLabel {
+        color: var(--primary);
+      }
+      
+      &::after {
+        background-color: var(--primary);
+      }
+    }
+  }
+
+  @media (min-width: 769px) {
+    flex-direction: column;
+
+    .step {
+      display: flex;
+      align-items: center;
+      
+      &:not(:last-child) {
+        margin-right: 0;
+        margin-bottom: 24px;
+
+        &::after {
+          top: calc(100%);
+          left: 4px;
+          transform: translateY(0);
+          width: 1px;
+          height: 25px;
+        }
+      }
+
+      .stepMarker {
+        margin-right: 8px;
+      }
+
+      .stepLabel {
+        display: block;
+      }
+    }
+  }
+}
