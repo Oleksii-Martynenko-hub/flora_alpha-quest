@@ -21,7 +21,7 @@ function FormStepsIndicator({ currentStep }: FormStepsIndicatorProps) {
   ]
 
   return (
-    <aside>
+    <aside className={styles.stepsIndicator}>
       <ul className={styles.stepsList}>
         {steps.map(({ label, step }) => (
           <li
