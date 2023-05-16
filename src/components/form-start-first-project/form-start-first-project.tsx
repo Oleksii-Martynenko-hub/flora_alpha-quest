@@ -16,6 +16,10 @@ function FormStartFirstProject() {
     'Tools',
   ]
 
+  const defaultName = store.getState().form.formStepsData.startFirstProject.name || ''
+  const defaultUrl = store.getState().form.formStepsData.startFirstProject.url || ''
+  const defaultCategory = store.getState().form.formStepsData.startFirstProject.category || []
+
   async function handleSubmit(formData: FormData) {
     'use server'
     const formattedData: IStartFirstProject = {
@@ -39,7 +43,13 @@ function FormStartFirstProject() {
       <form action={handleSubmit}>
         <div>
           <label htmlFor='name'>Project Name (It can be changed later)</label>
-          <input id='name' type='text' name='name' placeholder='Project Name' />
+          <input
+            id='name'
+            type='text'
+            name='name'
+            defaultValue={defaultName}
+            placeholder='Project Name'
+          />
         </div>
 
         <div>
@@ -48,6 +58,7 @@ function FormStartFirstProject() {
             id='url'
             type='text'
             name='url'
+            defaultValue={defaultUrl}
             placeholder='Project URL'
             prefix='Alphaguilty.io/'
           />
@@ -57,7 +68,13 @@ function FormStartFirstProject() {
           <label>Project Category (It cannot be changed after creation)</label>
           {categories.map((category) => (
             <div key={category}>
-              <input id={category} type='checkbox' name='category' value={category} />
+              <input
+                id={category}
+                type='checkbox'
+                name='category'
+                value={category}
+                defaultChecked={defaultCategory.includes(category)}
+              />
               <label htmlFor={category}>{category}</label>
             </div>
           ))}
