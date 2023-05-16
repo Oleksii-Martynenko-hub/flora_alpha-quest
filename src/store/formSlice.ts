@@ -55,6 +55,9 @@ export const formSlice = createSlice({
     nextStep: (state) => {
       state.currentStep += 1
     },
+    prevStep: (state) => {
+      state.currentStep -= 1
+    },
     setStartStepData: (state, { payload }: PayloadAction<IStartFirstProject>) => {
       state.formStepsData.startFirstProject = payload
     },
@@ -67,6 +70,6 @@ export const formSlice = createSlice({
   },
 })
 
-export const { nextStep, setStartStepData, setProjectDetailsData, setCreateProjectData } =
+export const { nextStep, prevStep, setStartStepData, setProjectDetailsData, setCreateProjectData } =
   formSlice.actions
 export default formSlice.reducer
