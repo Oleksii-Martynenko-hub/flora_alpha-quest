@@ -36,13 +36,13 @@ function FormProjectDetails() {
 
   return (
     <main>
-      <h2>
-        <p>Project Details</p>
-        What is your main goal with AlphaQuest <span>?</span>
-      </h2>
+      <h2>Project Details</h2>
 
       <form action={handleSubmit}>
         <div>
+          <label htmlFor='mainGoal'>
+            What is your main goal with AlphaQuest <span>?</span>
+          </label>
           {goals.map((goal) => (
             <div key={goal.replace(/ /g, '-')}>
               <input
