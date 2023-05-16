@@ -13,7 +13,7 @@ export interface IProjectDetails {
 
 export interface ICreateProject {
   workersAmount: number
-  launchType: 'pre' | 'post'
+  launchType: string
   email: string
 }
 
