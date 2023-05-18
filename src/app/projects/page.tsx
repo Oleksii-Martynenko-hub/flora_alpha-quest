@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
-  const data = await fetch('http://localhost:3000/api/projects')
+  const data = await fetch(process.env.API_URL + '/projects')
 
   return data.json() as Promise<{ projects: IProject[] }>
 }

@@ -85,7 +85,7 @@ export const createProjectAsync = createAsyncThunk<void, ICreateProject>(
         ...createProject,
       }
 
-      await fetch('/api/projects', {
+      await fetch(process.env.API_URL + '/projects', {
         method: 'POST',
         body: JSON.stringify(newProject),
         headers: {
