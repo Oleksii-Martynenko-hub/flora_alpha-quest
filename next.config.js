@@ -23,6 +23,7 @@ const nextConfig = (phase) => {
   }
 
   return {
+    output: 'export',
     env,
   }
 }
