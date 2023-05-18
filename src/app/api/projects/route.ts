@@ -7,10 +7,10 @@ import { ProjectsController } from '@/utils/localDB'
 const filename = 'projects'
 
 export async function GET() {
-  const projects = new ProjectsController<IProject>(filename)
+  // const projects = new ProjectsController<IProject>(filename)
 
-  const projectsData = projects.getAllProjects()
-  return NextResponse.json({ projects: projectsData })
+  // const projectsData = projects.getAllProjects()
+  return NextResponse.json({ projects: [] })
 }
 
 export async function POST(req: NextRequest) {
