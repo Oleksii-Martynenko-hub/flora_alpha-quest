@@ -6,7 +6,7 @@ import { ProjectsController } from '@/utils/localDB'
 
 const filename = 'projects'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const projects = new ProjectsController<IProject>(filename)
 
   const projectsData = projects.getAllProjects()

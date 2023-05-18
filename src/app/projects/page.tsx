@@ -4,13 +4,11 @@ import Link from 'next/link'
 import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
-  const data = await axios.get<IProject[]>(process.env.API_URL + '/projects')
-
-  return { projects: data.data }
+  return axios.get<IProject[]>(process.env.API_URL + '/projects')
 }
 
 export default async function Page() {
-  const { projects } = await getProjects()
+  const { data: projects } = await getProjects()
 
   return (
     <>
