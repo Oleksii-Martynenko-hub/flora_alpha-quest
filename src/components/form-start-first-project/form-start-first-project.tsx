@@ -1,54 +1,74 @@
-import { revalidatePath } from 'next/cache'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { store } from '@/store'
-import { IStartFirstProject, nextStep, setStartStepData } from '@/store/formSlice'
+import {
+  IStartFirstProject,
+  LOCAL_DATA,
+  nextStep,
+  selectStartFirstProjectData,
+  setStartFirstProjectData,
+} from '@/store/formSlice'
+
+import { useTextInput } from '@/components/hooks/useInput'
+import { useLocalStorage } from '@/components/hooks/useLocalStorage'
+import { useCheckboxInputGroup } from '@/components/hooks/useCheckboxInputGroup'
+
+import styles from './form-start-first-project.module.scss'
+
+const categoriesList = [
+  'NFT',
+  'GameFi',
+  'DeFi',
+  'DAO',
+  'Ecosystem',
+  'Others',
+  'SocialFi',
+  'Metaverse',
+  'Tools',
+]
 
 function FormStartFirstProject() {
-  const categories = [
-    'NFT',
-    'GameFi',
-    'DeFi',
-    'DAO',
-    'Ecosystem',
-    'Others',
-    'SocialFi',
-    'Metaverse',
-    'Tools',
-  ]
+  const dispatch = useDispatch()
 
-  const defaultName = store.getState().form.formStepsData.startFirstProject.name || ''
-  const defaultUrl = store.getState().form.formStepsData.startFirstProject.url || ''
-  const defaultCategory = store.getState().form.formStepsData.startFirstProject.category || []
+  const startFirstProject = useSelector(selectStartFirstProjectData) as IStartFirstProject
+  const [_, setLocalStartFirstProject] = useLocalStorage(LOCAL_DATA.START_FIRST_PROJECT)
 
-  async function handleSubmit(formData: FormData) {
-    'use server'
-    const formattedData: IStartFirstProject = {
-      name: formData.get('name') as string,
-      url: formData.get('url') as string,
-      category: [...formData.getAll('category')] as string[],
+  const [name, setName] = useTextInput(startFirstProject.name)
+  const [url, setUrl] = useTextInput(startFirstProject.url)
+  const [chosenCategories, setChosenCategories] = useCheckboxInputGroup(startFirstProject.category)
+
+  const nextStepHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (!name || !url || !chosenCategories.length) {
+      alert('Please fill all fields')
+      return
     }
 
-    store.dispatch(nextStep())
-    store.dispatch(setStartStepData(formattedData))
-    revalidatePath('/')
+    const data: IStartFirstProject = {
+      name,
+      url,
+      category: chosenCategories,
+    }
+
+    setLocalStartFirstProject(data)
+    dispatch(setStartFirstProjectData(data))
+    dispatch(nextStep())
   }
 
   return (
-    <main>
-      <h2>
-        <p>To Create Quest you need firstly create Project</p>
-        Add New Project
-      </h2>
+    <>
+      <h3>Add New Project</h3>
 
-      <form action={handleSubmit}>
+      <form onSubmit={nextStepHandler}>
         <div>
           <label htmlFor='name'>Project Name (It can be changed later)</label>
           <input
             id='name'
             type='text'
             name='name'
-            defaultValue={defaultName}
             placeholder='Project Name'
+            value={name}
+            onChange={setName}
           />
         </div>
 
@@ -58,22 +78,23 @@ function FormStartFirstProject() {
             id='url'
             type='text'
             name='url'
-            defaultValue={defaultUrl}
             placeholder='Project URL'
-            prefix='Alphaguilty.io/'
+            value={url}
+            onChange={setUrl}
           />
         </div>
 
         <div>
           <label>Project Category (It cannot be changed after creation)</label>
-          {categories.map((category) => (
+          {categoriesList.map((category) => (
             <div key={category}>
               <input
                 id={category}
                 type='checkbox'
                 name='category'
                 value={category}
-                defaultChecked={defaultCategory.includes(category)}
+                checked={chosenCategories.includes(category)}
+                onChange={setChosenCategories}
               />
               <label htmlFor={category}>{category}</label>
             </div>
@@ -82,7 +103,7 @@ function FormStartFirstProject() {
 
         <button type='submit'>Add Project</button>
       </form>
-    </main>
+    </>
   )
 }
 
