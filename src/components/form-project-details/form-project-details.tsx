@@ -1,68 +1,73 @@
-import { revalidatePath } from 'next/cache'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { store } from '@/store'
-import { IProjectDetails, nextStep, prevStep, setProjectDetailsData } from '@/store/formSlice'
+import {
+  IProjectDetails,
+  LOCAL_DATA,
+  nextStep,
+  prevStep,
+  selectProjectDetailsData,
+  setProjectDetailsData,
+} from '@/store/formSlice'
 
-const getFormattedData = (formData: FormData) => {
-  const formattedData: IProjectDetails = {
-    mainGoal: formData.get('mainGoal') as string,
-  }
+import { useTextInput } from '@/components/hooks/useInput'
+import { useLocalStorage } from '@/components/hooks/useLocalStorage'
 
-  return formattedData
-}
+const goals = ['Grow My Community', 'Activate Existing Members', 'Understand My Members', 'Other']
 
 function FormProjectDetails() {
-  const goals = ['Grow My Community', 'Activate Existing Members', 'Understand My Members', 'Other']
+  const dispatch = useDispatch()
 
-  const defaultGoal = store.getState().form.formStepsData.projectDetails.mainGoal || ''
+  const projectDetails = useSelector(selectProjectDetailsData) as IProjectDetails
+  const [_, setLocalProjectDetails] = useLocalStorage(LOCAL_DATA.PROJECT_DETAILS)
 
-  async function handleSubmit(formData: FormData) {
-    'use server'
-    store.dispatch(nextStep())
+  const [chosenGoal, setChosenGoal] = useTextInput(projectDetails?.mainGoal)
 
-    store.dispatch(setProjectDetailsData(getFormattedData(formData)))
+  const nextStepHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
 
-    revalidatePath('/')
+    if (!chosenGoal) {
+      alert('Please choose a goal')
+      return
+    }
+
+    setLocalProjectDetails({ mainGoal: chosenGoal })
+    dispatch(setProjectDetailsData({ mainGoal: chosenGoal }))
+    dispatch(nextStep())
   }
 
-  async function handleBack(formData: FormData) {
-    'use server'
-    store.dispatch(prevStep())
-
-    store.dispatch(setProjectDetailsData(getFormattedData(formData)))
-
-    revalidatePath('/')
+  const prevStepHandler = () => {
+    setLocalProjectDetails({ mainGoal: chosenGoal })
+    dispatch(setProjectDetailsData({ mainGoal: chosenGoal }))
+    dispatch(prevStep())
   }
 
   return (
-    <main>
-      <h2>Project Details</h2>
+    <form onSubmit={nextStepHandler}>
+      <div>
+        <label htmlFor='mainGoal'>
+          What is your main goal with AlphaQuest <span>?</span>
+        </label>
 
-      <form action={handleSubmit}>
-        <div>
-          <label htmlFor='mainGoal'>
-            What is your main goal with AlphaQuest <span>?</span>
-          </label>
-          {goals.map((goal) => (
-            <div key={goal.replace(/ /g, '-')}>
-              <input
-                id={goal.replace(/ /g, '-')}
-                type='radio'
-                name='mainGoal'
-                value={goal}
-                defaultChecked={defaultGoal === goal}
-              />
-              <label htmlFor={goal.replace(/ /g, '-')}>{goal}</label>
-            </div>
-          ))}
-        </div>
+        {goals.map((goal) => (
+          <div key={goal.replace(/ /g, '-')}>
+            <input
+              id={goal.replace(/ /g, '-')}
+              type='radio'
+              name='mainGoal'
+              value={goal}
+              checked={chosenGoal === goal}
+              onChange={setChosenGoal}
+            />
+            <label htmlFor={goal.replace(/ /g, '-')}>{goal}</label>
+          </div>
+        ))}
+      </div>
 
-        <div>
-          <button formAction={handleBack}>Back</button>
-          <button type='submit'>Continue</button>
-        </div>
-      </form>
-    </main>
+      <div>
+        <button onClick={prevStepHandler}>Back</button>
+        <button type='submit'>Continue</button>
+      </div>
+    </form>
   )
 }
 
