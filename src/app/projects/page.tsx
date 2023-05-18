@@ -5,14 +5,11 @@ import { IProject } from '@/store/formSlice'
 async function getProjects() {
   const data = await fetch(process.env.API_URL + '/projects')
 
-  // return data.json() as Promise<{ projects: IProject[] }>
-  return data
+  return data.json() as Promise<{ projects: IProject[] }>
 }
 
 export default async function Page() {
-  const data = await getProjects()
-  console.log('🚀 ~ Page ~ data:', data)
-  const projects: IProject[] = []
+  const { projects } = await getProjects()
 
   return (
     <>
