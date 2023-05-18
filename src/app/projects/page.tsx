@@ -1,11 +1,11 @@
-import Link from 'next/link'
+// import Link from 'next/link'
 
-import { IProject } from '@/store/formSlice'
+// import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
   const data = await fetch(process.env.API_URL + '/projects')
 
-  return data.json() as Promise<{ projects: IProject[] }>
+  return data.json() as Promise<{ projects: any[] }>
 }
 
 export default async function Page() {
@@ -14,9 +14,7 @@ export default async function Page() {
   return (
     <>
       <section>
-        <div>
-          <Link href={'/'}>New project</Link>
-        </div>
+        <div>{/* <Link href={'/'}>New project</Link> */}</div>
 
         <ul style={{ margin: '20px 0 0 0' }}>
           {projects.map(
