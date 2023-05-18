@@ -13,11 +13,11 @@ export async function GET() {
   return NextResponse.json({ projects: [] })
 }
 
-export async function POST(req: NextRequest) {
-  const data = await req.json()
-  const projects = new ProjectsController<IProject>(filename)
+// export async function POST(req: NextRequest) {
+//   const data = await req.json()
+//   const projects = new ProjectsController<IProject>(filename)
 
-  projects.add(data)
+//   projects.add(data)
 
-  return NextResponse.json({ data })
-}
+//   return NextResponse.json({ data })
+// }
