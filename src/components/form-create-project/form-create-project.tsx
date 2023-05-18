@@ -1,93 +1,151 @@
-import { revalidatePath } from 'next/cache'
+import { AnyAction } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
 
-import { store } from '@/store'
-import { ICreateProject, nextStep, prevStep, setCreateProjectData } from '@/store/formSlice'
+import {
+  ICreateProject,
+  LOCAL_DATA,
+  createProjectAsync,
+  prevStep,
+  selectAPIStatus,
+  selectCreateProjectData,
+  setCreateProjectData,
+} from '@/store/formSlice'
 
-const getFormattedData = (formData: FormData) => {
-  const formattedData: ICreateProject = {
-    workersAmount: Number(formData.get('workerAmount') as string),
-    email: formData.get('email') as string,
-    launchType: formData.get('launchType') as string,
-  }
+import { useTextInput } from '@/components/hooks/useInput'
+import { useNumberInput } from '@/components/hooks/useNumberInput'
+import { useLocalStorage } from '@/components/hooks/useLocalStorage'
 
-  return formattedData
+const launchTypes = {
+  pre: 'Pre Product',
+  post: 'Post Product',
 }
 
 function FormCreateProject() {
-  const defaultWorkersAmount = store.getState().form.formStepsData.createProject.workersAmount || 1
-  const defaultLaunchType = store.getState().form.formStepsData.createProject.launchType || ''
-  const defaultEmail = store.getState().form.formStepsData.createProject.email || ''
+  const router = useRouter()
+  const dispatch = useDispatch()
 
-  async function handleSubmit(formData: FormData) {
-    'use server'
-    store.dispatch(nextStep())
-    store.dispatch(setCreateProjectData(getFormattedData(formData)))
-    revalidatePath('/')
+  const { isLoading, isRejected, error } = useSelector(selectAPIStatus)
+
+  const createProject = useSelector(selectCreateProjectData) as ICreateProject
+  const [, setLocalCurrentStep] = useLocalStorage(LOCAL_DATA.CURRENT_STEP)
+  const [, setLocalStartFirstProject] = useLocalStorage(LOCAL_DATA.START_FIRST_PROJECT)
+  const [, setLocalProjectDetails] = useLocalStorage(LOCAL_DATA.PROJECT_DETAILS)
+  const [, setLocalCreateProject] = useLocalStorage(LOCAL_DATA.CREATE_PROJECT)
+
+  const [workersAmount, setWorkersAmount, { increment, decrement }] = useNumberInput(
+    createProject.workersAmount,
+  )
+  const [launchType, setLaunchType] = useTextInput(createProject.launchType)
+  const [email, setEmail] = useTextInput(createProject.email)
+
+  const setData = () => {
+    const data = { workersAmount: +workersAmount, launchType, email }
+    setLocalCreateProject(data)
+    dispatch(setCreateProjectData(data))
   }
 
-  async function handleBack(formData: FormData) {
-    'use server'
-    store.dispatch(prevStep())
-    store.dispatch(setCreateProjectData(getFormattedData(formData)))
-    revalidatePath('/')
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (!workersAmount || !launchType || !email) {
+      alert('Please fill all fields')
+      return
+    }
+
+    setData()
+
+    try {
+      await dispatch(
+        createProjectAsync({
+          workersAmount: +workersAmount,
+          launchType,
+          email,
+        }) as unknown as AnyAction,
+      )
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLocalCurrentStep(undefined)
+      setLocalStartFirstProject(undefined)
+      setLocalProjectDetails(undefined)
+      setLocalCreateProject(undefined)
+      router.push('/projects')
+    }
   }
+
+  const prevStepHandler = () => {
+    setData()
+    dispatch(prevStep())
+  }
+
+  if (isRejected && error) {
+    alert(error)
+  }
+
   return (
-    <main>
-      <h2>Create Project</h2>
-
-      <form action={handleSubmit}>
+    <form onSubmit={onSubmitHandler}>
+      <div>
+        <label htmlFor='workersAmount'>How many full-time workers on project?</label>
         <div>
-          <label htmlFor='workersAmount'>How many full-time workers on project?</label>
+          <button onClick={decrement}>-</button>
           <input
             id='workersAmount'
-            type='number'
-            name='workersAmount'
-            defaultValue={defaultWorkersAmount}
-          />
-        </div>
-
-        <div>
-          <label htmlFor='launchType'>Are you pre or post product launch?</label>
-          <div>
-            <input
-              id='Pre-Product'
-              type='radio'
-              name='mainGoal'
-              value='Pre Product'
-              defaultChecked={defaultLaunchType === 'Pre Product'}
-            />
-            <label htmlFor='Pre-Product'>Pre Product</label>
-          </div>
-
-          <div>
-            <input
-              id='Post-Product'
-              type='radio'
-              name='mainGoal'
-              value='Post Product'
-              defaultChecked={defaultLaunchType === 'Post Product'}
-            />
-            <label htmlFor='Post-Product'>Post Product</label>
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor='email'>Contact Email</label>
-          <input
-            id='email'
             type='text'
-            name='email'
-            defaultValue={defaultEmail}
-            placeholder='Project Email'
+            name='workersAmount'
+            placeholder='Workers quantity'
+            value={workersAmount}
+            onChange={setWorkersAmount}
           />
+
+          <button onClick={increment}>+</button>
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor='launchType'>Are you pre or post product launch?</label>
+        <div>
+          <input
+            id={launchTypes.pre.replace(' ', '-')}
+            type='radio'
+            name='launchType'
+            value={launchTypes.pre}
+            checked={launchType === launchTypes.pre}
+            onChange={setLaunchType}
+          />
+          <label htmlFor={launchTypes.pre.replace(' ', '-')}>{launchTypes.pre}</label>
         </div>
 
         <div>
-          <button formAction={handleBack}>Back</button>
-          <button type='submit'>Continue</button>
+          <input
+            id={launchTypes.post.replace(' ', '-')}
+            type='radio'
+            name='launchType'
+            value={launchTypes.post}
+            checked={launchType === launchTypes.post}
+            onChange={setLaunchType}
+          />
+          <label htmlFor={launchTypes.post.replace(' ', '-')}>{launchTypes.post}</label>
         </div>
-      </form>
-    </main>
+      </div>
+
+      <div>
+        <label htmlFor='email'>Contact Email</label>
+        <input
+          id='email'
+          type='text'
+          name='email'
+          placeholder='Project Email'
+          value={email}
+          onChange={setEmail}
+        />
+      </div>
+
+      <div>
+        <button onClick={prevStepHandler}>Back</button>
+        <button type='submit'>{isLoading ? 'Loading...' : 'Create Project'}</button>
+      </div>
+    </form>
   )
 }
 
