@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { IProject } from '@/store/formSlice'
 
-async function getProjects() {
+function getProjects() {
   return axios.get<IProject[]>(process.env.API_URL + '/projects')
 }
 

@@ -25,9 +25,6 @@ const nextConfig = (phase) => {
   return {
     basePath: isDev ? '' : '/flora_alpha-quest',
     output: 'export',
-    experimental: {
-      enableUndici: true,
-    },
     env,
   }
 }
