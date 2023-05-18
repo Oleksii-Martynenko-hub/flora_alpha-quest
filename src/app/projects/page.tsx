@@ -1,14 +1,16 @@
-import axios from 'axios'
 import Link from 'next/link'
+import fetch from 'node-fetch'
 
 import { IProject } from '@/store/formSlice'
 
-function getProjects() {
-  return axios.get<IProject[]>(process.env.API_URL + '/projects')
+async function getProjects() {
+  const data = await fetch(process.env.API_URL + '/projects')
+
+  return data.json() as Promise<{ projects: IProject[] }>
 }
 
 export default async function Page() {
-  const { data: projects } = await getProjects()
+  const { projects } = await getProjects()
 
   return (
     <>
