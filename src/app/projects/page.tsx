@@ -10,21 +10,22 @@ async function getProjects() {
     const responseClone = response.clone()
     const dataText = await responseClone.text()
     console.log('🚀 ~ getProjects ~ dataText:', dataText)
-    return response.json() as Promise<{
-      projects: {
+    return response.json() as Promise<
+      {
         id: number
         title: string
       }[]
-    }>
+    >
     // return response.json() as Promise<{ projects: IProject[] }>
   } catch (error) {
     console.log('error:', error)
-    return { projects: [] }
+    // return { projects: [] }
+    return []
   }
 }
 
 export default async function Page() {
-  const { projects } = await getProjects()
+  const projects = await getProjects()
   console.log('🚀 ~ Page ~ projects:', projects)
 
   return (
