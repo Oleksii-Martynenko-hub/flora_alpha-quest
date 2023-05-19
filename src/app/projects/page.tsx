@@ -6,7 +6,7 @@ import { IProject } from '@/store/formSlice'
 async function getProjects() {
   try {
     // const response = await fetch('https://dummyjson.com/posts?limit=3')
-    const response = await fetch('/api/projects')
+    const response = await fetch('/flora_alpha-quest/api/projects')
     const responseClone = response.clone()
     const dataText = await responseClone.text()
     console.log('🚀 ~ getProjects ~ dataText:', dataText)
