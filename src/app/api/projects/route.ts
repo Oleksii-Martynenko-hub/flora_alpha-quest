@@ -6,12 +6,12 @@ import { ProjectsController } from '@/utils/localDB'
 
 const filename = 'projects'
 
-export async function GET(req: NextRequest) {
-  const projects = new ProjectsController<IProject>(filename)
+// export async function GET(req: NextRequest) {
+//   const projects = new ProjectsController<IProject>(filename)
 
-  const projectsData = projects.getAllProjects()
-  return NextResponse.json({ projects: projectsData })
-}
+//   const projectsData = projects.getAllProjects()
+//   return NextResponse.json({ projects: projectsData })
+// }
 
 export async function POST(req: NextRequest) {
   const data = await req.json()
