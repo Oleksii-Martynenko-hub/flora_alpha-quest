@@ -1,16 +1,21 @@
 import Link from 'next/link'
-import fetch from 'node-fetch'
+// import fetch from 'node-fetch'
 
 import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
   const data = await fetch(process.env.API_URL + '/projects')
+  // console.log('🚀 ~ getProjects ~ data:', await data.text())
 
-  return data.json() as Promise<{ projects: IProject[] }>
+  // return data.json() as Promise<{ projects: IProject[] }>
+  return data.text() as Promise<string>
 }
 
 export default async function Page() {
-  const { projects } = await getProjects()
+  // const { projects } = await getProjects()
+  const data = await getProjects()
+  const { projects } = JSON.parse(data) as { projects: IProject[] }
+  console.log('🚀 ~ Page ~ projects:', projects)
 
   return (
     <>
