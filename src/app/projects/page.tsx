@@ -4,17 +4,24 @@ import Link from 'next/link'
 import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
-  const data = await fetch(process.env.API_URL + '/projects')
-  // console.log('🚀 ~ getProjects ~ data:', await data.text())
-
-  // return data.json() as Promise<{ projects: IProject[] }>
-  return data.text() as Promise<string>
+  try {
+    const response = await fetch(process.env.API_URL + '/projects')
+    const responseClone = response.clone()
+    const dataText = await responseClone.text()
+    console.log('🚀 ~ getProjects ~ dataText:', dataText)
+    return response.json() as Promise<{ projects: IProject[] }>
+    // return response.text() as Promise<string>
+  } catch (error) {
+    console.log('error:', error)
+    return { projects: [] }
+  }
+  
 }
 
 export default async function Page() {
-  // const { projects } = await getProjects()
-  const data = await getProjects()
-  const { projects } = JSON.parse(data) as { projects: IProject[] }
+  const { projects } = await getProjects()
+  // const data = await getProjects()
+  // const { projects } = JSON.parse(data) as { projects: IProject[] }
   console.log('🚀 ~ Page ~ projects:', projects)
 
   return (
