@@ -5,7 +5,7 @@ import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
   try {
-    const response = await fetch('https://dummyjson.com/posts/3')
+    const response = await fetch('https://dummyjson.com/posts?limit=10')
     // const response = await fetch(process.env.API_URL + '/projects')
     const responseClone = response.clone()
     const dataText = await responseClone.text()
