@@ -5,22 +5,22 @@ import { IProject } from '@/store/formSlice'
 
 async function getProjects() {
   try {
-    const response = await fetch('https://dummyjson.com/posts?limit=10')
+    const response = await fetch('https://dummyjson.com/posts/3')
     // const response = await fetch(process.env.API_URL + '/projects')
     const responseClone = response.clone()
     const dataText = await responseClone.text()
     console.log('🚀 ~ getProjects ~ dataText:', dataText)
-    return response.json() as Promise<
-      {
+    return response.json() as Promise<{
+      posts: {
         id: number
         title: string
       }[]
-    >
+    }>
     // return response.json() as Promise<{ projects: IProject[] }>
   } catch (error) {
     console.log('error:', error)
     // return { projects: [] }
-    return []
+    return { posts: [] }
   }
 }
 
@@ -36,7 +36,7 @@ export default async function Page() {
         </div>
 
         <ul style={{ margin: '20px 0 0 0' }}>
-          {projects.map(({ id, title }) => (
+          {projects.posts.map(({ id, title }) => (
             <>
               <li key={id} style={{ margin: '0 0 0 20px' }}>
                 <h3>{title}</h3>
